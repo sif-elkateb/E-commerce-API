@@ -13,6 +13,7 @@ const UserSchema=mongoose.Schema({
     email:{
         type:String,
         required:[true,'the email of the user must be provided'],
+        unique:true,
         validate:{
             validator:validator.isEmail,
             message:'A valid email must be provided'
