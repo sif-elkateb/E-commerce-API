@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
-const { BadRequestError } = require("../errors");
+const { BadRequestError, AuthenticationError } = require("../errors");
 const UserModel = require("../models/user");
-const { setResponseCookies } = require("../utils");
+const { setResponseCookies, resetJWTCookie } = require("../utils");
 
 
 const registerUser=async(req,res,next)=>{
@@ -22,11 +22,29 @@ const registerUser=async(req,res,next)=>{
     res.status(StatusCodes.CREATED).json({user:payload})
 }
 const loginUser=async(req,res,next)=>{
-    res.status(StatusCodes.OK).json({msg:'user loggedin successfully'})
+    const {email,password}=req.body;
+    if(!email||!password){
+        throw new BadRequestError('both email and password must be provided')
+    }
+    const user=await UserModel.findOne({email});
+    if(!user){
+        throw new AuthenticationError('invalid credentials');
+    }
+    const result=await user.comparePassword(password);
+    if(!result){
+        throw new AuthenticationError('invalid credentials');
+    }
+
+    const payload={name:user.name,userId:user._id,role:user.role};
+
+    setResponseCookies({res,payload})
+
+    res.status(StatusCodes.OK).json({user:payload})
 }
 
 const logoutUser=async(req,res,next)=>{
-    res.status(StatusCodes.OK).json({msg:'user loggedout successfully'})
+    resetJWTCookie(res);
+    res.redirect('/');
 }
 
 

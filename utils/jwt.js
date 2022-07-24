@@ -24,6 +24,13 @@ const setResponseCookies=({res,payload})=>{
     res.cookie('token',token,{httpOnly:true,expires:cookieExpireDate})
 }
 
+const resetJWTCookie=(res)=>{
+    res.cookie('token','logout',{
+        httpOnly:true,
+        expires:new Date()    
+    })
+}
 
 
-module.exports={verifyJWT,createJWT,setResponseCookies};
+
+module.exports={verifyJWT,createJWT,setResponseCookies,resetJWTCookie}

@@ -1,6 +1,6 @@
-const { createJWT, verifyJWT,setResponseCookies } = require("./jwt");
+const { createJWT, verifyJWT,setResponseCookies,resetJWTCookie } = require("./jwt");
 
 
 
 
-module.exports={createJWT,verifyJWT,setResponseCookies};
+module.exports={createJWT,verifyJWT,setResponseCookies,resetJWTCookie};
