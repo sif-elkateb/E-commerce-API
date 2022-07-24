@@ -9,8 +9,9 @@ const morgan=require('morgan');
 const cookieParser=require('cookie-parser');
 const errorHandlerMiddleware = require('./middleware/error-handler');
 const notFoundHandlerMiddleware = require('./middleware/not-found');
-const userRouter = require('./routes/authRoute');
 const startServer = require('./start-server');
+const authRouter = require('./routes/authRoute');
+const userRouter = require('./routes/userRoute');
 
 const app=express();
 
@@ -31,7 +32,8 @@ app.get('/',(req,res)=>{
 })
 
 
-app.use('/api/v1/auth',userRouter);
+app.use('/api/v1/auth',authRouter);
+app.use('/api/v1/users',userRouter);
 
 app.use(notFoundHandlerMiddleware);
 

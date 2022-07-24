@@ -19,7 +19,7 @@ const registerUser=async(req,res,next)=>{
 
     setResponseCookies({res,payload})
 
-    res.status(StatusCodes.CREATED).json({user:payload})
+    res.status(StatusCodes.CREATED).json({success:true,user:payload})
 }
 const loginUser=async(req,res,next)=>{
     const {email,password}=req.body;
@@ -39,12 +39,12 @@ const loginUser=async(req,res,next)=>{
 
     setResponseCookies({res,payload})
 
-    res.status(StatusCodes.OK).json({user:payload})
+    res.status(StatusCodes.OK).json({success:true,user:payload})
 }
 
 const logoutUser=async(req,res,next)=>{
     resetJWTCookie(res);
-    res.redirect('/');
+    res.status(StatusCodes.OK).json({success:true,msg:'the user logged out successfully'})
 }
 
 
