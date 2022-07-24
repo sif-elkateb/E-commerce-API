@@ -1,8 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError } = require("../errors");
 const UserModel = require("../models/user");
-const { createJWT } = require("../utils");
-const date = require('date-and-time');
+const { setResponseCookies } = require("../utils");
 
 
 const registerUser=async(req,res,next)=>{
@@ -16,14 +15,11 @@ const registerUser=async(req,res,next)=>{
     const role=(await UserModel.countDocuments({}))===0?'admin':'user'
     const user=await UserModel.create({name,email,password,role});
 
-    const tokenUser={name:user.name,userId:user._id,role};
+    const payload={name:user.name,userId:user._id,role};
 
-    const token=createJWT({payload:tokenUser});
-    const now = new Date();
-    const cookieExpireDate = date.addDays(now,30);
-    res.cookie('token',token,{httpOnly:true,expires:cookieExpireDate})
+    setResponseCookies({res,payload})
 
-    res.status(StatusCodes.CREATED).json({user:tokenUser})
+    res.status(StatusCodes.CREATED).json({user:payload})
 }
 const loginUser=async(req,res,next)=>{
     res.status(StatusCodes.OK).json({msg:'user loggedin successfully'})

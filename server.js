@@ -5,6 +5,8 @@ const express=require('express');
 const { StatusCodes } = require('http-status-codes');
 
 const morgan=require('morgan');
+
+const cookieParser=require('cookie-parser');
 const errorHandlerMiddleware = require('./middleware/error-handler');
 const notFoundHandlerMiddleware = require('./middleware/not-found');
 const userRouter = require('./routes/authRoute');
@@ -18,11 +20,13 @@ const port =process.env.PORT||3000;
 //middleware
 app.use(morgan('dev'));
 app.use(express.json())
+app.use(cookieParser());
 app.use(express.urlencoded({extended:false}))
 app.use(express.static('public'))
 
 
 app.get('/',(req,res)=>{
+    console.log(req.cookies)
     res.status(StatusCodes.OK).json({msg:'welcome'})
 })
 

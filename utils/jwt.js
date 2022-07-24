@@ -1,4 +1,6 @@
 const jwt=require('jsonwebtoken');
+const date = require('date-and-time');
+
 
 
 
@@ -15,4 +17,13 @@ const verifyJWT=({token})=>jwt.verify(token,process.env.SECRET_KEY);
 
 
 
-module.exports={verifyJWT,createJWT};
+const setResponseCookies=({res,payload})=>{
+    const token=createJWT({payload});
+    const now = new Date();
+    const cookieExpireDate = date.addDays(now,30);
+    res.cookie('token',token,{httpOnly:true,expires:cookieExpireDate})
+}
+
+
+
+module.exports={verifyJWT,createJWT,setResponseCookies};
