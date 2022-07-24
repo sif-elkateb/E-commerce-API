@@ -1,6 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
-const { NotFoundError } = require("../errors");
-const UserModel = require("../models/user")
+const { NotFoundError, BadRequestError, AuthenticationError } = require("../errors");
+const UserModel = require("../models/user");
+const { createJWTPayload, setResponseCookies, checkPermissions } = require("../utils");
 
 
 const getAllUsers=async(req,res,next)=>{
@@ -14,18 +15,49 @@ const getSingleUser=async(req,res,next)=>{
     if(!user){
         throw new NotFoundError('no user with this id is found on the server')
     }
-    res.status(StatusCodes.OK).json({succes:true,user})
+    
+    checkPermissions(req.user,user._id)
+    res.status(StatusCodes.OK).json({success:true,user})
 }
 
 
 const showCurrentUser=async(req,res,next)=>{
-    res.status(StatusCodes.OK).json({msg:'showing the current user'})
+    res.status(StatusCodes.OK).json({success:true,user:req.user})
 }
 const updateUserPassword=async(req,res,next)=>{
-    res.status(StatusCodes.OK).json({msg:'updating the password'})
+    const {oldPassword,newPassword}=req.body;
+    if(!oldPassword ||!newPassword){
+        throw new BadRequestError('both old password and new password must be provided');
+    }
+    const user=await UserModel.findOne({_id:req.user.userId});
+
+    const comparePasswords=user.comparePassword(oldPassword);
+    if(!comparePasswords){
+        throw new AuthenticationError('the old password is wrong');
+    }
+    user.password=newPassword;
+
+    await user.save();
+
+    res.status(StatusCodes.OK).json({success:true,msg:'password updated successfully',user:req.user})
 }
 const updateUser=async(req,res,next)=>{
-    res.status(StatusCodes.OK).json({msg:'updating the user data'})
+    const {email,name,password}=req.body;
+    if(!email||!name||!password){
+        throw new BadRequestError('both email and name must be provided');
+    }
+    const user=await UserModel.findOne({_id:req.user.userId});
+    const comparePasswords=await user.comparePassword(password);
+    if(!comparePasswords){
+        throw new AuthenticationError('the password provided is wrong')
+    }
+    user.name=name;
+    user.email=email;
+    await user.save();
+    const payload=await createJWTPayload({user});
+    setResponseCookies({res,payload})
+
+    res.status(StatusCodes.OK).json({success:true,msg:'updated the user',user:payload})
 }
 
 

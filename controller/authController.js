@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, AuthenticationError } = require("../errors");
 const UserModel = require("../models/user");
-const { setResponseCookies, resetJWTCookie } = require("../utils");
+const { setResponseCookies, resetJWTCookie, createJWTPayload } = require("../utils");
 
 
 const registerUser=async(req,res,next)=>{
@@ -15,7 +15,7 @@ const registerUser=async(req,res,next)=>{
     const role=(await UserModel.countDocuments({}))===0?'admin':'user'
     const user=await UserModel.create({name,email,password,role});
 
-    const payload={name:user.name,userId:user._id,role};
+    const payload=createJWTPayload({user})
 
     setResponseCookies({res,payload})
 
@@ -35,7 +35,7 @@ const loginUser=async(req,res,next)=>{
         throw new AuthenticationError('invalid credentials');
     }
 
-    const payload={name:user.name,userId:user._id,role:user.role};
+    const payload=createJWTPayload({user})
 
     setResponseCookies({res,payload})
 

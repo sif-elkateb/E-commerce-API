@@ -9,15 +9,14 @@ const userRouter=express.Router();
 userRouter.route('/').get(authenticateUser,authorizePermissions('admin'),getAllUsers);
 
 
-userRouter.route('/show-current-user').get(showCurrentUser);
+userRouter.route('/show-current-user').get(authenticateUser,showCurrentUser);
 
-userRouter.route('/update-password').patch(updateUserPassword);
+userRouter.route('/update-password').patch(authenticateUser,updateUserPassword);
 
-userRouter.route('/update-user').patch(updateUser);
+userRouter.route('/update-user').patch(authenticateUser,updateUser);
 
 
-
-userRouter.route('/:id').get(getSingleUser)
+userRouter.route('/:id').get(authenticateUser,getSingleUser)
 
 
 module.exports=userRouter;

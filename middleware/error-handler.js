@@ -7,7 +7,7 @@ const errorHandlerMiddleware=(err,req,res,next)=>{
     //     return res.status(err.statusCode).json({msg:err.message})
     // }
 
-
+    console.log(err);
 
     const customError={
         message:err.message||'Error occured at the server please try again later',
